@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="mx.indra.ingenset.mappers.SettlementMapper">
+    
+    <delete id="deleteSettlementForContractID" parameterType="mx.indra.ingenset.beans.SettlementRequestBean">
+		DELETE FROM INGEN_SET_MARKET.SHADOW_INV_STATE
+		WHERE ID_SHADOW_INV IN (
+		SELECT ID_SHADOW_INV FROM V_SETTLEMENT
+		WHERE ID_CONTRACT = #{settlementBean.contractID} AND DATE_INV BETWEEN TO_DATE(#{settlementBean.date}, 'DD/MM/YY') AND LAST_DAY(TO_DATE(#{settlementBean.date}, 'DD/MM/YY')));
+	</delete>
+	
+	
+    <delete id="deleteFromDealState">
+		DELETE FROM INGEN_SET_MARKET.Deal_State
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromDealDecl">
+		DELETE FROM INGEN_SET_MARKET.Deal_Decl
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromDealOtherInfo">
+		DELETE FROM INGEN_SET_MARKET.Deal_Other_Info
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromDealMasterAgr">
+		DELETE FROM INGEN_SET_MARKET.DEAL_MASTER_AGR
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromDealContract">
+		DELETE FROM INGEN_SET_MARKET.DEAL_CONTRACT DC
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromDeal">
+		DELETE FROM INGEN_SET_MARKET.DEAL
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+	
+    <delete id="deleteFromTrdCenDealParam">
+		DELETE FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM
+		WHERE ID_DEAL IN (SELECT ID_DEAL FROM INGEN_SET_MARKET.TRD_CEN_DEAL_PARAM WHERE ID_PARAM = #{contractID})
+	</delete>
+    
+</mapper>

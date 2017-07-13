@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="mx.indra.ingenset.mappers.StatusMapper">
+    
+	<resultMap id="getShadowResult" type="mx.indra.ingenset.beans.ShadowInvStateBean">		
+		<result column="ID_SHADOW_INV" property="shadowInvID"/>
+		<result column="VER_SHADOW_INV" property="verShadowInv"/>
+		<result column="CODE_TYPE_STATE" property="codeTYpeState"/>
+		<result column="NUMBER_SEQUENTIAL" property="numberSequential"/>
+		<result column="CODE_INVOICE_STATE" property="codeInvoiceState"/>
+		<result column="CODE_STATUS" property="codeStatus"/>
+		<result column="DATE_INSERT" property="dateInsert"/>
+		<result column="DATE_MOD" property="dateModif"/>
+		<result column="CODE_USER" property="codeUser"/>
+		<result column="PROCESS" property="process"/>
+	</resultMap>
+	
+    <select id="getDataShadowInvoice" resultMap="getShadowResult">    
+		SELECT SIS.ID_SHADOW_INV, SIS.VER_SHADOW_INV, SIS.CODE_TYPE_STATE, (SIS.NUMBER_SEQUENTIAL+1) NUMBER_SEQUENTIAL, #{statusBean.statusToChange} CODE_INVOICE_STATE, SIS.CODE_STATUS, SYSDATE DATE_INSERT, SYSDATE DATE_MOD, 'BATCHH' CODE_USER, 'FENIX JOB' PROCESS
+		FROM INGEN_SET_MARKET.SHADOW_INV_STATE SIS
+		WHERE SIS.ID_SHADOW_INV = (SELECT ID_SHADOW_INV FROM V_SETTLEMENT WHERE ID_CONTRACT = #{statusBean.contractID} AND ID_PRESCRIPTION = 1000 AND DATE_INV = TO_DATE(#{statusBean.fechaParam}, 'DD/MM/YY'))
+		ORDER BY SIS.VER_SHADOW_INV DESC, SIS.NUMBER_SEQUENTIAL DESC
+		FETCH FIRST 1 ROWS ONLY
+    </select>
+    
+    <insert id="insertChangeStatus" parameterType="mx.indra.ingenset.beans.StatusRequestBean">
+		INSERT INTO INGEN_SET_MARKET.SHADOW_INV_STATE (ID_SHADOW_INV, VER_SHADOW_INV, CODE_TYPE_STATE, NUMBER_SEQUENTIAL,CODE_INVOICE_STATE,CODE_STATUS,DATE_INSERT,DATE_MOD,CODE_USER,PROCESS)
+		SELECT SIS.ID_SHADOW_INV, SIS.VER_SHADOW_INV, SIS.CODE_TYPE_STATE, (SIS.NUMBER_SEQUENTIAL+1) NUMBER_SEQUENTIAL, #{statusBean.statusToChange} CODE_INVOICE_STATE, SIS.CODE_STATUS, SYSDATE DATE_INSERT, SYSDATE DATE_MOD, 'BATCHH' CODE_USER, 'FENIX JOB' PROCESS
+		FROM INGEN_SET_MARKET.SHADOW_INV_STATE SIS
+		WHERE SIS.ID_SHADOW_INV = (SELECT ID_SHADOW_INV FROM V_SETTLEMENT WHERE ID_CONTRACT = #{statusBean.contractID} AND ID_PRESCRIPTION = 1000 AND DATE_INV = TO_DATE(#{statusBean.fechaParam}, 'DD/MM/YY'))
+		ORDER BY SIS.VER_SHADOW_INV DESC, SIS.NUMBER_SEQUENTIAL DESC
+		FETCH FIRST 1 ROWS ONLY
+	</insert>
+    
+</mapper>
